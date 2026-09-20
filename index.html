@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>GREEN-API Client</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .container {
+            width: min(100% - 32px, 1200px);
+            margin: 40px auto;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .left-column {
+            min-width: 0;
+        }
+
+        .right-column {
+            min-width: 0;
+            position: sticky;
+            top: 20px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+
+            font-size: 32px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            margin: 0 0 20px;
+
+            font-size: 20px;
+            font-weight: 650;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+
+            padding: 12px 14px;
+
+            font: inherit;
+            font-size: 14px;
+
+            outline: none;
+
+            background: #ffffff;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .token-wrapper {
+            position: relative;
+        }
+
+        .token-wrapper input {
+            padding-right: 90px;
+        }
+
+        .toggle-token {
+            position: absolute;
+
+            right: 8px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+            background: transparent;
+
+            color: #2563eb;
+
+            cursor: pointer;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+
+            padding: 11px 16px;
+
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            background: #2563eb;
+            color: #ffffff;
+
+            transition:
+                transform 0.1s,
+                opacity 0.2s,
+                background 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary-button {
+            background: #374151;
+        }
+
+        .secondary-button:hover {
+            background: #1f2937;
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 12px;
+        }
+
+        .response-header h2 {
+            margin: 0;
+        }
+
+        .clear-button {
+            padding: 8px 12px;
+
+            background: #eef2ff;
+            color: #3730a3;
+
+            font-size: 13px;
+        }
+
+        .clear-button:hover {
+            background: #e0e7ff;
+        }
+
+        #response {
+            width: 100%;
+            min-height: 300px;
+
+            padding: 16px;
+
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+
+            background: #111827;
+            color: #e5e7eb;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 13px;
+            line-height: 1.6;
+
+            resize: vertical;
+
+            outline: none;
+        }
+
+        .status {
+            margin-top: 12px;
+
+            min-height: 20px;
+
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .hint {
+            margin-top: 6px;
+
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                width: min(100% - 20px, 1000px);
+                margin: 20px auto;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right-column {
+                position: static;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <h1>GREEN-API Client</h1>
+
+        <p>
+            Тестовое задание — Специалист технической поддержки 2 линии
+        </p>
+    </header>
+
+
+    <div class="main-layout">
+
+        <div class="left-column">
+
+    <!-- ПОДКЛЮЧЕНИЕ -->
+    <section class="card">
+
+        <h2>Параметры подключения</h2>
+
+        <div class="form-group">
+
+            <label for="idInstance">
+                idInstance
+            </label>
+
+            <input
+                id="idInstance"
+                type="text"
+                placeholder="Например: 1101000001"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="apiTokenInstance">
+                ApiTokenInstance
+            </label>
+
+            <div class="token-wrapper">
+
+                <input
+                    id="apiTokenInstance"
+                    type="password"
+                    placeholder="Введите ApiTokenInstance"
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-token"
+                    id="toggleToken"
+                >
+                    Показать
+                </button>
+
+            </div>
+
+            <div class="hint">
+                Токен используется только для выполнения запросов
+                и не сохраняется в браузере.
+            </div>
+
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                type="button"
+                id="getSettingsButton"
+            >
+                getSettings
+            </button>
+
+
+            <button
+                type="button"
+                id="getStateButton"
+            >
+                getStateInstance
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ОТПРАВКА СООБЩЕНИЯ -->
+    <section class="card">
+
+        <h2>Отправка сообщения</h2>
+
+        <div class="form-group">
+
+            <label for="messageChatId">
+                Chat ID
+            </label>
+
+            <input
+                id="messageChatId"
+                type="text"
+                placeholder="Например: 77001234567@c.us"
+                autocomplete="off"
+            >
+
+            <div class="hint">
+                Для личного чата используется формат:
+                номер@c.us
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="messageText">
+                Сообщение
+            </label>
+
+            <textarea
+                id="messageText"
+                placeholder="Введите текст сообщения..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                type="button"
+                id="sendMessageButton"
+            >
+                sendMessage
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ОТПРАВКА ФАЙЛА -->
+    <section class="card">
+
+        <h2>Отправка файла</h2>
+
+        <div class="form-group">
+
+            <label for="fileChatId">
+                Chat ID
+            </label>
+
+            <input
+                id="fileChatId"
+                type="text"
+                placeholder="Например: 77001234567@c.us"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="fileUrl">
+                URL файла
+            </label>
+
+            <input
+                id="fileUrl"
+                type="url"
+                placeholder="https://example.com/file.jpg"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="fileName">
+                Имя файла
+            </label>
+
+            <input
+                id="fileName"
+                type="text"
+                placeholder="Например: photo.jpg"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="fileCaption">
+                Подпись
+            </label>
+
+            <input
+                id="fileCaption"
+                type="text"
+                placeholder="Необязательно"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                type="button"
+                id="sendFileButton"
+            >
+                sendFileByUrl
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+        </div>
+
+        <div class="right-column">
+
+    <!-- ОТВЕТ API -->
+    <section class="card">
+
+        <div class="response-header">
+
+            <h2>Ответ API</h2>
+
+            <button
+                type="button"
+                class="clear-button"
+                id="clearResponseButton"
+            >
+                Очистить
+            </button>
+
+        </div>
+
+
+        <textarea
+            id="response"
+            readonly
+            spellcheck="false"
+            placeholder="Здесь появится ответ GREEN-API..."
+        ></textarea>
+
+
+        <div
+            class="status"
+            id="status"
+        ></div>
+
+    </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * ============================================
+     * GREEN-API CLIENT
+     * ============================================
+     *
+     * Здесь находится JavaScript нашего приложения.
+     *
+     * JavaScript отвечает за:
+     * 1. Получение данных из формы.
+     * 2. Формирование URL API.
+     * 3. Отправку HTTP-запросов.
+     * 4. Получение ответа GREEN-API.
+     * 5. Вывод ответа на страницу.
+     */
+
+
+    // Адрес API GREEN-API.
+    const API_URL = "https://api.green-api.com";
+
+
+    /*
+     * Получаем элементы HTML со страницы.
+     *
+     * document.getElementById("...")
+     * находит элемент по его id.
+     */
+
+    const idInstanceInput =
+        document.getElementById("idInstance");
+
+    const apiTokenInput =
+        document.getElementById("apiTokenInstance");
+
+    const responseOutput =
+        document.getElementById("response");
+
+    const statusOutput =
+        document.getElementById("status");
+
+
+    const getSettingsButton =
+        document.getElementById("getSettingsButton");
+
+    const getStateButton =
+        document.getElementById("getStateButton");
+
+    const sendMessageButton =
+        document.getElementById("sendMessageButton");
+
+    const sendFileButton =
+        document.getElementById("sendFileButton");
+
+    const clearResponseButton =
+        document.getElementById("clearResponseButton");
+
+    const toggleTokenButton =
+        document.getElementById("toggleToken");
+
+
+    /*
+     * Получаем значения параметров подключения.
+     */
+
+    function getConnectionData() {
+
+        const idInstance =
+            idInstanceInput.value.trim();
+
+        const apiTokenInstance =
+            apiTokenInput.value.trim();
+
+
+        if (!idInstance) {
+            throw new Error(
+                "Введите idInstance."
+            );
+        }
+
+
+        if (!apiTokenInstance) {
+            throw new Error(
+                "Введите ApiTokenInstance."
+            );
+        }
+
+
+        return {
+            idInstance,
+            apiTokenInstance
+        };
+    }
+
+
+    /*
+     * Формируем базовый URL конкретного инстанса.
+     *
+     * Например:
+     *
+     * https://api.green-api.com/
+     * waInstance1101000001/
+     */
+
+    function getInstanceUrl() {
+
+        const {
+            idInstance
+        } = getConnectionData();
+
+
+        return `${API_URL}/waInstance${idInstance}`;
+    }
+
+
+    /*
+     * Формируем полный URL метода.
+     *
+     * Например:
+     *
+     * /getSettings/TOKEN
+     */
+
+    function getMethodUrl(methodName) {
+
+        const {
+            apiTokenInstance
+        } = getConnectionData();
+
+
+        return `${getInstanceUrl()}/${methodName}/${apiTokenInstance}`;
+    }
+
+
+    /*
+     * Выводим ответ API.
+     *
+     * Если GREEN-API вернул JSON,
+     * мы красиво форматируем его.
+     */
+
+    function showResponse(data) {
+
+        if (typeof data === "string") {
+
+            try {
+
+                const parsed =
+                    JSON.parse(data);
+
+                responseOutput.value =
+                    JSON.stringify(
+                        parsed,
+                        null,
+                        2
+                    );
+
+            } catch {
+
+                responseOutput.value =
+                    data;
+            }
+
+            return;
+        }
+
+
+        responseOutput.value =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+    }
+
+
+    /*
+     * Показываем сообщение пользователю.
+     */
+
+    function setStatus(message) {
+
+        statusOutput.textContent =
+            message;
+    }
+
+
+    /*
+     * Общая функция для API-запросов.
+     *
+     * Это важная часть приложения.
+     *
+     * Вместо того чтобы четыре раза
+     * писать одинаковую обработку ошибок,
+     * мы сделали одну универсальную функцию.
+     */
+
+    async function request(
+        url,
+        options = {}
+    ) {
+
+        setStatus("Выполняется запрос...");
+
+
+        /*
+         * Блокируем кнопки,
+         * чтобы пользователь случайно
+         * не отправил несколько запросов.
+         */
+
+        setButtonsDisabled(true);
+
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    options
+                );
+
+
+            /*
+             * Получаем текст ответа.
+             *
+             * Это позволяет нормально
+             * обработать как JSON,
+             * так и обычный текст.
+             */
+
+            const text =
+                await response.text();
+
+
+            let data;
+
+
+            try {
+
+                data =
+                    JSON.parse(text);
+
+            } catch {
+
+                data =
+                    text;
+            }
+
+
+            /*
+             * Показываем ответ
+             * независимо от HTTP-статуса.
+             */
+
+            showResponse(data);
+
+
+            if (!response.ok) {
+
+                setStatus(
+                    `Ошибка HTTP: ${response.status}`
+                );
+
+                return;
+            }
+
+
+            setStatus(
+                `Запрос выполнен успешно. HTTP ${response.status}`
+            );
+
+        } catch (error) {
+
+            /*
+             * Сюда попадём, например,
+             * если браузер не смог выполнить запрос.
+             */
+
+            responseOutput.value =
+                JSON.stringify(
+                    {
+                        error: error.message
+                    },
+                    null,
+                    2
+                );
+
+
+            setStatus(
+                `Ошибка: ${error.message}`
+            );
+
+        } finally {
+
+            setButtonsDisabled(false);
+        }
+    }
+
+
+    /*
+     * Включаем / выключаем кнопки.
+     */
+
+    function setButtonsDisabled(disabled) {
+
+        getSettingsButton.disabled =
+            disabled;
+
+        getStateButton.disabled =
+            disabled;
+
+        sendMessageButton.disabled =
+            disabled;
+
+        sendFileButton.disabled =
+            disabled;
+    }
+
+
+    /*
+     * ============================================
+     * getSettings
+     * ============================================
+     *
+     * GET-запрос.
+     *
+     * Получает текущие настройки инстанса.
+     */
+
+    async function getSettings() {
+
+        try {
+
+            const url =
+                getMethodUrl(
+                    "getSettings"
+                );
+
+
+            await request(url);
+
+        } catch (error) {
+
+            responseOutput.value =
+                JSON.stringify(
+                    {
+                        error: error.message
+                    },
+                    null,
+                    2
+                );
+
+            setStatus(
+                `Ошибка: ${error.message}`
+            );
+        }
+    }
+
+
+    /*
+     * ============================================
+     * getStateInstance
+     * ============================================
+     *
+     * GET-запрос.
+     *
+     * Получает состояние инстанса.
+     */
+
+    async function getStateInstance() {
+
+        try {
+
+            const url =
+                getMethodUrl(
+                    "getStateInstance"
+                );
+
+
+            await request(url);
+
+        } catch (error) {
+
+            responseOutput.value =
+                JSON.stringify(
+                    {
+                        error: error.message
+                    },
+                    null,
+                    2
+                );
+
+            setStatus(
+                `Ошибка: ${error.message}`
+            );
+        }
+    }
+
+
+    /*
+     * ============================================
+     * sendMessage
+     * ============================================
+     *
+     * POST-запрос.
+     *
+     * Отправляет текстовое сообщение.
+     */
+
+    async function sendMessage() {
+
+        try {
+
+            const chatId =
+                document
+                    .getElementById("messageChatId")
+                    .value
+                    .trim();
+
+
+            const message =
+                document
+                    .getElementById("messageText")
+                    .value
+                    .trim();
+
+
+            if (!chatId) {
+
+                throw new Error(
+                    "Введите Chat ID."
+                );
+            }
+
+
+            if (!message) {
+
+                throw new Error(
+                    "Введите текст сообщения."
+                );
+            }
+
+
+            const url =
+                getMethodUrl(
+                    "sendMessage"
+                );
+
+
+            const body = {
+
+                chatId:
+                    chatId,
+
+                message:
+                    message
+
+            };
+
+
+            await request(
+                url,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(body)
+                }
+            );
+
+        } catch (error) {
+
+            responseOutput.value =
+                JSON.stringify(
+                    {
+                        error: error.message
+                    },
+                    null,
+                    2
+                );
+
+            setStatus(
+                `Ошибка: ${error.message}`
+            );
+        }
+    }
+
+
+    /*
+     * ============================================
+     * sendFileByUrl
+     * ============================================
+     *
+     * POST-запрос.
+     *
+     * Отправляет файл по URL.
+     */
+
+    async function sendFileByUrl() {
+
+        try {
+
+            const chatId =
+                document
+                    .getElementById("fileChatId")
+                    .value
+                    .trim();
+
+
+            const urlFile =
+                document
+                    .getElementById("fileUrl")
+                    .value
+                    .trim();
+
+
+            const fileName =
+                document
+                    .getElementById("fileName")
+                    .value
+                    .trim();
+
+
+            const caption =
+                document
+                    .getElementById("fileCaption")
+                    .value
+                    .trim();
+
+
+            if (!chatId) {
+
+                throw new Error(
+                    "Введите Chat ID."
+                );
+            }
+
+
+            if (!urlFile) {
+
+                throw new Error(
+                    "Введите URL файла."
+                );
+            }
+
+
+            if (!fileName) {
+
+                throw new Error(
+                    "Введите имя файла."
+                );
+            }
+
+
+            const url =
+                getMethodUrl(
+                    "sendFileByUrl"
+                );
+
+
+            const body = {
+
+                chatId:
+                    chatId,
+
+                urlFile:
+                    urlFile,
+
+                fileName:
+                    fileName
+
+            };
+
+
+            /*
+             * Caption является необязательным.
+             * Поэтому добавляем его только
+             * если пользователь его заполнил.
+             */
+
+            if (caption) {
+
+                body.caption =
+                    caption;
+            }
+
+
+            await request(
+                url,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(body)
+                }
+            );
+
+        } catch (error) {
+
+            responseOutput.value =
+                JSON.stringify(
+                    {
+                        error: error.message
+                    },
+                    null,
+                    2
+                );
+
+            setStatus(
+                `Ошибка: ${error.message}`
+            );
+        }
+    }
+
+
+    /*
+     * ============================================
+     * События кнопок
+     * ============================================
+     *
+     * addEventListener говорит:
+     *
+     * "Когда пользователь нажмёт кнопку,
+     * выполни указанную функцию".
+     */
+
+
+    getSettingsButton
+        .addEventListener(
+            "click",
+            getSettings
+        );
+
+
+    getStateButton
+        .addEventListener(
+            "click",
+            getStateInstance
+        );
+
+
+    sendMessageButton
+        .addEventListener(
+            "click",
+            sendMessage
+        );
+
+
+    sendFileButton
+        .addEventListener(
+            "click",
+            sendFileByUrl
+        );
+
+
+    /*
+     * Очистка поля ответа.
+     */
+
+    clearResponseButton
+        .addEventListener(
+            "click",
+            () => {
+
+                responseOutput.value =
+                    "";
+
+                setStatus("");
+            }
+        );
+
+
+    /*
+     * Показать / скрыть API-токен.
+     */
+
+    toggleTokenButton
+        .addEventListener(
+            "click",
+            () => {
+
+                const isPassword =
+                    apiTokenInput.type ===
+                    "password";
+
+
+                apiTokenInput.type =
+                    isPassword
+                        ? "text"
+                        : "password";
+
+
+                toggleTokenButton.textContent =
+                    isPassword
+                        ? "Скрыть"
+                        : "Показать";
+            }
+        );
+
+</script>
+
+</body>
+</html>
